@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVG-Z Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="../src/svgz.js"></script>
+<style>
+:root {
+  --bg:       #f4f4f0;
+  --surface:  #ffffff;
+  --surface2: #f9f9f6;
+  --border:   #d8d8ce;
+  --text:     #22222e;
+  --text-dim: #aaaabc;
+  --text-mid: #66667a;
+  --accent:   #2563eb;
+  --accent2:  #dc2f5a;
+  --accent3:  #7048d4;
+  --code-bg:  #1e1e2a;
+  --code-text:#a8e8a8;
+  --serif:    'Lora', Georgia, serif;
+  --sans:     'Inter', system-ui, sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+  --col:      680px;
+  --radius:   10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 17px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  line-height: 1.8;
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.book {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  min-height: 100vh;
+}
+
+/* ── Sidebar / TOC ── */
+nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  padding: 40px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  line-height:30px;
+  color: var(--text);
+  padding: 0 24px 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.nav-logo span { color: var(--text-dim); }
+
+.nav-section {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  padding: 16px 24px 6px;
+  text-transform: uppercase;
+}
+
+nav a {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--text-mid);
+  text-decoration: none;
+  padding: 5px 24px;
+  display: block;
+  transition: color 0.15s;
+  border-left: 2px solid transparent;
+}
+nav a:hover { color: var(--text); }
+nav a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(37,99,235,0.05);
+}
+
+/* ── Main content ── */
+main { padding: 0; overflow-x: hidden; }
+
+/* ── Chapters ── */
+.chapter {
+  display: none;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 60px 120px;
+}
+.chapter.visible { display: block; }
+
+/* ── Chapter header ── */
+.ch-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-family: var(--serif);
+  font-size: 2.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #111118;
+  margin-bottom: 32px;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #222233;
+  margin: 52px 0 16px;
+  letter-spacing: -0.01em;
+}
+h3 {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent3);
+  margin: 36px 0 12px;
+}
+
+p {
+  margin-bottom: 1.4em;
+  color: var(--text);
+  font-size: 1rem;
+}
+p em { color: var(--accent); font-style: italic; }
+p strong { color: #111118; font-weight: 600; }
+
+a { color: var(--accent3); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── Live editors ── */
+.live-editor {
+  margin: 36px -20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.editor-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--text-mid);
+}
+.editor-run {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(37,99,235,0.25);
+  color: var(--accent);
+  padding: 3px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.editor-run:hover { background: rgba(37,99,235,0.16); }
+
+.editor-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.editor-body.full-canvas {
+  grid-template-columns: 1fr;
+}
+.editor-code {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+textarea.code {
+  width: 100%;
+  flex: 1;
+  min-height: 240px;
+  background: var(--code-bg);
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--code-text);
+  padding: 16px;
+  tab-size: 2;
+}
+.editor-canvas-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a10;
+  padding: 0;
+  position: relative;
+}
+.editor-canvas-wrap canvas {
+  display: block;
+}
+
+/* Controls help button */
+.controls-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.7);
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 10;
+  line-height: 1;
+}
+.controls-btn:hover { background: rgba(255,255,255,0.22); }
+
+.controls-tooltip {
+  display: none;
+  position: absolute;
+  bottom: 36px;
+  right: 8px;
+  background: rgba(20,20,30,0.96);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.7;
+  white-space: nowrap;
+  z-index: 20;
+}
+.controls-tooltip.visible { display: block; }
+
+.editor-error {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent2);
+  padding: 6px 14px;
+  border-top: 1px solid var(--border);
+  min-height: 24px;
+  background: rgba(220,47,90,0.04);
+}
+
+/* ── Exercise blocks ── */
+.exercise {
+  margin: 32px 0;
+  padding: 20px 24px;
+  border-left: 3px solid var(--accent3);
+  background: rgba(112,72,212,0.04);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.exercise-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--accent3);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.exercise p { margin-bottom: 0.6em; font-size: 0.95rem; }
+.exercise p:last-child { margin-bottom: 0; }
+
+/* ── Note blocks ── */
+.note {
+  margin: 28px 0;
+  padding: 18px 22px;
+  border-left: 3px solid var(--accent);
+  background: rgba(37,99,235,0.04);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.93rem;
+}
+.note-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+/* ── Inline code ── */
+code {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  background: rgba(37,99,235,0.07);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #2044aa;
+}
+
+/* ── Attribute tables ── */
+.attr-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0 28px;
+  font-size: 0.88rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.attr-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.attr-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  vertical-align: top;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.attr-table tr:last-child td { border-bottom: none; }
+.attr-table td:first-child {
+  font-family: var(--mono);
+  font-size: 0.8em;
+  color: #2044aa;
+  white-space: nowrap;
+}
+.attr-table td:nth-child(2) { color: var(--accent3); font-size: 0.82em; font-family: var(--mono); }
+
+/* ── Chapter nav ── */
+.ch-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 80px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.ch-nav-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-mid);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.ch-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ch-nav-btn.next { margin-left: auto; }
+
+/* ── Math display ── */
+.math-display {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: var(--radius);
+  line-height: 2;
+}
+
+/* ── Mobile hamburger button ── */
+.nav-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  width: 38px;
+  height: 38px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ── Nav drawer close button (mobile only) ── */
+.nav-close {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-mid);
+}
+
+/* ── Nav backdrop ── */
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 150;
+}
+.nav-backdrop.open { display: block; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .nav-toggle { display: flex; }
+  .nav-close  { display: flex; }
+
+  /* Nav becomes a slide-in drawer */
+  .book { grid-template-columns: 1fr; }
+  nav {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    left: -270px;
+    width: 260px;
+    height: 100vh;
+    z-index: 160;
+    transition: left 0.25s ease;
+    box-shadow: 4px 0 32px rgba(0,0,0,0.18);
+    padding-top: 52px;
+  }
+  nav.open { left: 0; }
+
+  /* Content top padding to clear the hamburger button */
+  main { padding-top: 0; }
+  .chapter { padding: 60px 20px 80px; }
+
+  /* Editor layout: stack vertically, canvas on top */
+  .editor-body { grid-template-columns: 1fr; }
+  .editor-code { border-right: none; border-bottom: 1px solid var(--border); order: 1; }
+  .editor-canvas-wrap { order: 0; }
+
+  /* Canvas scales to fill available width */
+  .editor-canvas-wrap canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  /* Remove negative side margins */
+  .live-editor { margin: 24px 0; }
+}
+</style>
+</head>
+<body>
+<button class="nav-toggle" id="navToggle" aria-label="Open menu">&#9776;</button>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<div class="book">
+
+<!-- ── NAV ── -->
+<nav id="navEl">
+  <button class="nav-close" id="navClose" aria-label="Close menu">&#x2715;</button>
+  <div class="nav-logo">SVG-Z<br>THE GUIDE<br><span style="font-size:9px;color:var(--text-dim);letter-spacing:0.1em">v1.0</span></div>
+  <div class="nav-section">Introduction</div>
+  <a href="#" data-ch="ch-intro" class="active">What is SVG-Z?</a>
+  <a href="#" data-ch="ch-controls">Controls &amp; Interaction</a>
+  <a href="#" data-ch="ch-hello">Hello, 3D World</a>
+  <div class="nav-section">Geometry</div>
+  <a href="#" data-ch="ch-paths">Paths &amp; Polygons</a>
+  <a href="#" data-ch="ch-camera">The Camera</a>
+  <a href="#" data-ch="ch-depth">Depth &amp; Z-Buffer</a>
+  <div class="nav-section">Surfaces</div>
+  <a href="#" data-ch="ch-sphere">Spheres</a>
+  <a href="#" data-ch="ch-cylinder">Cylinders &amp; Cones</a>
+  <a href="#" data-ch="ch-lathe">Lathe</a>
+  <a href="#" data-ch="ch-extrude">Extrusions</a>
+  <a href="#" data-ch="ch-surface">Bézier Patches</a>
+  <div class="nav-section">Rendering</div>
+  <a href="#" data-ch="ch-transparency">Transparency</a>
+  <a href="#" data-ch="ch-aa">Anti-Aliasing</a>
+  <div class="nav-section">Using It</div>
+  <a href="#" data-ch="ch-ref">Full Reference</a>
+</nav>
+
+<!-- ── CHAPTERS ── -->
+<main id="mainEl">
+
+<!-- ════════════════════════════════════════════════ CH 00 -->
+<div class="chapter visible" id="ch-intro">
+  <div class="ch-eyebrow">Chapter 01 &nbsp;·&nbsp; svgz.js v1.0</div>
+  <h1>What is SVG-Z?</h1>
+
+  <p>SVG changed the web by making graphics declarative. You describe <em>what</em> you want — a circle here, a path there — and the browser draws it. No pixel-pushing, no render loops, no matrix math leaking into your markup.</p>
+
+  <p>SVG-Z asks: what if you could do the same thing in three dimensions?</p>
+
+  <p>Not with a full 3D engine. Not with meshes, shaders, or normal maps. Just the same clean declarative approach you already know from SVG — extended with a <strong>Z coordinate</strong>.</p>
+
+  <p>Every path command gains a third number. Every shape can exist at any depth. A z-buffer resolves which geometry is in front. Transparent surfaces blend correctly. The camera is a single XML element. And the result renders to a plain <code>&lt;canvas&gt;</code> — no WebGL required.</p>
+
+  <h2>The core idea</h2>
+  <p>In regular SVG you write:</p>
+
+  <div class="live-editor">
+    <div class="editor-header">
+      <span class="editor-label">SVG — flat, 2D</span>
+    </div>
+    <div class="editor-body full-canvas">
+      <div style="padding:20px;background:var(--code-bg);font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--code-text)">
+&lt;svg width="200" height="200"&gt;<br>
+&nbsp;&nbsp;&lt;circle cx="100" cy="100" r="60" fill="#7c6aff"/&gt;<br>
+&lt;/svg&gt;
+      </div>
+    </div>
+  </div>
+
+  <p>In SVG-Z you write the same thing — but each shape has a position in 3D space. Orbit the camera and watch them correctly occlude each other from every angle:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">SVG-Z — pyramid, sphere and cylinder in 3D</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#f6f6f4">
+  <camera fov="44" eye="5,5,36"
+    center="0.4,0.6,0" up="0,1,0" orbit="1"/>
+  <!-- Ground slab — top -->
+  <polygon3d
+    points3d="-4,0,-3  4,0,-3  4,0,3  -4,0,3"
+    fill="#d0d0c8" stroke="#b8b8b0" stroke-width="2"/>
+  <!-- Ground slab — front edge -->
+  <polygon3d
+    points3d="-4,0,3  4,0,3  4,-0.28,3  -4,-0.28,3"
+    fill="#b8b8b0" stroke="#b8b8b0" stroke-width="1"/>
+  <!-- Ground slab — right edge -->
+  <polygon3d
+    points3d="4,0,-3  4,0,3  4,-0.28,3  4,-0.28,-3"
+    fill="#c4c4bc" stroke="#b8b8b0" stroke-width="1"/>
+  <!-- Ground slab — back edge -->
+  <polygon3d
+    points3d="4,0,-3  -4,0,-3  -4,-0.28,-3  4,-0.28,-3"
+    fill="#a8a8a0" stroke="#b8b8b0" stroke-width="1"/>
+  <!-- Ground slab — bottom -->
+  <polygon3d
+    points3d="-4,-0.28,-3  4,-0.28,-3  4,-0.28,3  -4,-0.28,3"
+    fill="#a0a098" stroke="#b8b8b0" stroke-width="1"/>
+  <!-- Red pyramid -->
+  <polygon3d points3d="-2.3,0,-1  -0.3,0,-1  -1.3,2,0"
+    fill="#dd2222" stroke="#ff5544" stroke-width="2"/>
+  <polygon3d points3d="-0.3,0,-1  -0.3,0,1  -1.3,2,0"
+    fill="#bb1a1a" stroke="#ff5544" stroke-width="2"/>
+  <polygon3d points3d="-0.3,0,1  -2.3,0,1  -1.3,2,0"
+    fill="#dd2222" stroke="#ff5544" stroke-width="2"/>
+  <polygon3d points3d="-2.3,0,1  -2.3,0,-1  -1.3,2,0"
+    fill="#bb1a1a" stroke="#ff5544" stroke-width="2"/>
+  <!-- Blue sphere -->
+  <sphere3d center="0.6,0.72,0"
+    radius="0.72" subdivisions="28"
+    fill="#1144bb" stroke="#4488ff"
+    stroke-width="2"
+    lat-rings="4" lon-lines="5"/>
+  <!-- Green cylinder -->
+  <cylinder3d
+    start="2.1,0,0" end="2.1,1.5,0"
+    radius="0.44" subdivisions="32"
+    fill="#1a6633" stroke="#33cc66"
+    stroke-width="2" lines="6" rings="1"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Drag to orbit the camera. Scroll to zoom. The depth buffer resolves every occlusion automatically — no painter's algorithm, no draw-order tricks.</p>
+
+  <h2>What SVG-Z is not</h2>
+  <p>SVG-Z is deliberately <em>not</em> a full 3D engine. There is no lighting model. No materials. No textures. No shadows. The rendering is flat — colour comes from the <code>fill</code> and <code>stroke</code> attributes, just like SVG. What you gain is correct 3D positioning, surfaces of revolution, Bézier patches, and per-pixel depth — without any of the complexity of a scene graph engine.</p>
+
+  <p>Think of it as the gap between SVG and Three.js. It lives happily in that space.</p>
+
+  <div class="ch-nav">
+    <span></span>
+    <button class="ch-nav-btn next" data-ch="ch-controls">Controls &amp; Interaction →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 01 -->
+<div class="chapter" id="ch-hello">
+  <div class="ch-eyebrow">Chapter 01</div>
+  <h1>Hello, 3D World</h1>
+
+  <p>Every SVG-Z document is wrapped in a <code>&lt;svgz&gt;</code> root element. Inside it lives a <code>&lt;camera&gt;</code> and your geometry. Let's start with the simplest possible scene.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">svgz-01 — minimal scene</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#0a0a0f">
+
+  <camera fov="50"
+    eye="0,0,15"
+    center="0,0,0"
+    up="0,1,0"/>
+
+  <sphere3d
+    center="0,0,0"
+    radius="1.2"
+    subdivisions="24"
+    fill="#1a0a30"
+    stroke="#7c6aff"
+    stroke-width="2"/>
+
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Try changing some values. What happens if you set <code>fov="20"</code>? Or <code>fov="90"</code>? What if you move the eye to <code>eye="0,3,15"</code>? What if you change the <code>background</code> to <code>"#1a0010"</code>?</p>
+
+  <h2>The root element</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>width</td><td>500</td><td>Canvas width in pixels</td></tr>
+    <tr><td>height</td><td>500</td><td>Canvas height in pixels</td></tr>
+    <tr><td>background</td><td>#0a0a0f</td><td>Background fill — any CSS colour</td></tr>
+  </table>
+
+  <h2>The camera</h2>
+  <p>The <code>&lt;camera&gt;</code> defines where you're looking from and what lens you're using. The three most important attributes are <code>eye</code> (your position), <code>center</code> (the point you're looking at), and <code>fov</code> (how wide the view is in degrees).</p>
+
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>fov</td><td>60</td><td>Vertical field of view (degrees). Lower = telephoto, higher = wide-angle</td></tr>
+    <tr><td>eye</td><td>0,0,5</td><td>Camera position in world space</td></tr>
+    <tr><td>center</td><td>0,0,0</td><td>Point the camera looks at</td></tr>
+    <tr><td>up</td><td>0,1,0</td><td>Which direction is "up" for the camera</td></tr>
+    <tr><td>near</td><td>0.1</td><td>Near clip plane</td></tr>
+    <tr><td>far</td><td>100</td><td>Far clip plane</td></tr>
+    <tr><td>aa</td><td>—</td><td>Anti-aliasing: <code>off</code>, <code>msaa2</code>, <code>msaa4</code>, <code>tsaa</code></td></tr>
+    <tr><td>orbit</td><td>—</td><td>Auto-rotate speed. <code>1</code>=forward, <code>-1</code>=reverse, <code>2</code>=double</td></tr>
+  </table>
+
+  <div class="note">
+    <div class="note-label">// note</div>
+    The renderer layers an <em>orbit camera</em> on top of the scene camera. Drag to orbit, scroll to zoom, shift-drag to pan. The scene camera sets the starting position; the orbit controls let you explore around it.
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Move the camera to <code>eye="3,3,12"</code>. Notice how you're now looking at the sphere from above and to the side.</p>
+    <p>Try <code>fov="15"</code> with <code>eye="0,0,30"</code>. The sphere looks flattened — that's telephoto compression.</p>
+    <p>Change <code>background</code> to a warm colour like <code>"#1a0800"</code>. How does the colour relationship between background and sphere change the mood?</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-controls">← Controls &amp; Interaction</button>
+    <button class="ch-nav-btn next" data-ch="ch-paths">Paths &amp; Polygons →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 02 -->
+<div class="chapter" id="ch-paths">
+  <div class="ch-eyebrow">Chapter 02</div>
+  <h1>Paths &amp; Polygons</h1>
+
+  <p>Before SVG-Z had surface primitives, it had <code>path3d</code> — the 3D analogue of SVG's <code>&lt;path&gt;</code>. The same command letters, the same structure, but every coordinate is an <code>x,y,z</code> triple instead of an <code>x,y</code> pair.</p>
+
+  <h2>The d3 attribute</h2>
+  <p>Where SVG uses <code>d="M 10,10 L 100,50"</code>, SVG-Z uses <code>d3="M 10,10,0 L 100,50,20"</code>. The third number is the Z coordinate — depth in world space.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">path3d — a 3D spiral</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <camera fov="55" eye="0,3,19"
+    center="0,0,-2" up="0,1,0"/>
+  <group3d transform3d="rotateY(30)">
+    <!-- Main spiral: 3 full turns, descending z -->
+    <path3d stroke="#00ffc8" stroke-width="3"
+      fill="none"
+      d3="M 2,0,1
+          C 2,1.1,0  1.1,2,-0.3  0,2,-0.5
+          C -1.1,2,-0.7  -2,1.1,-1  -2,0,-1
+          C -2,-1.1,-1  -1.1,-2,-1.3  0,-2,-1.5
+          C 1.1,-2,-1.7  2,-1.1,-2  2,0,-2
+          C 2,1.1,-2  1.1,2,-2.3  0,2,-2.5
+          C -1.1,2,-2.7  -2,1.1,-3  -2,0,-4"/>
+
+    <!-- Accent spiral slightly offset -->
+    <path3d stroke="#7c6aff" stroke-width="1.5"
+      fill="none" opacity="0.7"
+      d3="M 1.7,0,1.1
+          C 1.7,0.9,0.1  0.9,1.7,-0.2  0,1.7,-0.4
+          C -0.9,1.7,-0.6  -1.7,0.9,-0.9  -1.7,0,-0.9
+          C -1.7,-0.9,-0.9  -0.9,-1.7,-1.2  0,-1.7,-1.4
+          C 0.9,-1.7,-1.6  1.7,-0.9,-1.9  1.7,0,-1.9
+          C 1.7,0.9,-1.9  0.9,1.7,-2.2  0,1.7,-2.4
+          C -0.9,1.7,-2.6  -1.7,0.9,-2.9  -1.7,0,-3.9"/>
+
+    <!-- Vertical axis -->
+    <path3d stroke="#ffffff20" stroke-width="1"
+      fill="none"
+      d3="M 0,0,0.5  L 0,0,-3.5"/>
+  </group3d>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Orbit the view to see the curves in 3D. Each path uses a different stroke width and colour — these are independent primitives, each with its own depth relative to the z-buffer.</p>
+
+  <h2>Closed paths and fills</h2>
+  <p>End a path with <code>Z</code> to close it back to the <code>M</code> point. Closed paths can be filled — the interior depth is interpolated from the boundary using centroid fan triangulation.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">path3d — closed and filled</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <camera fov="50" eye="0,2,25"
+    center="0,0,0" up="0,1,0"/>
+
+  <!-- Diamond lying in 3D space -->
+  <path3d fill="#3b1f6e" stroke="#7c6aff"
+    stroke-width="2"
+    d3="M 0,2,0
+        L 1.5,0,1
+        L 0,-2,0
+        L -1.5,0,-1 Z"/>
+
+  <!-- A second diamond, different plane -->
+  <path3d fill="#004d3d" stroke="#00ffc8"
+    stroke-width="2"
+    d3="M 0,2,0
+        L 1.5,0,-1
+        L 0,-2,0
+        L -1.5,0,1 Z"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Orbit the view. The two diamonds intersect — the z-buffer resolves which is in front pixel-by-pixel.</p>
+
+  <h2>polygon3d</h2>
+  <p>For flat polygons, <code>&lt;polygon3d&gt;</code> is a shorthand. Instead of path commands you just list the vertices:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">polygon3d — three intersecting planes</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <camera fov="48" eye="3,3,25"
+    center="0,0,0" up="0,1,0"/>
+  <group3d transform3d="rotateY(45)">
+    <polygon3d
+      points3d="-2,-2,0  2,-2,0  2,2,0  -2,2,0"
+      fill="#00ffc8" opacity="0.5" stroke="none"/>
+
+    <polygon3d
+      points3d="0,-2,-2  0,2,-2  0,2,2  0,-2,2"
+      fill="#ff4d6d" opacity="0.5" stroke="none"/>
+
+    <polygon3d
+      points3d="-2,0,-2  2,0,-2  2,0,2  -2,0,2"
+      fill="#7c6aff" opacity="0.5" stroke="none"/>
+  </group3d>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>These three transparent planes cross through a single point. Orbit the camera — the blending between them is always correct, regardless of view angle. That's Weighted Blended Order-Independent Transparency.</p>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>In the spiral example, change the stroke widths and colours. Notice each path is a completely independent element.</p>
+    <p>In the diamond example, add a third diamond <code>path3d</code> and give it a different fill colour. Does the z-buffer handle the triple intersection?</p>
+    <p>Change the <code>opacity</code> values on the planes from <code>0.5</code> to <code>0.9</code>. What happens to the intersection colours?</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-hello">← Hello, 3D World</button>
+    <button class="ch-nav-btn next" data-ch="ch-camera">The Camera →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 03 -->
+<div class="chapter" id="ch-camera">
+  <div class="ch-eyebrow">Chapter 03</div>
+  <h1>The Camera</h1>
+
+  <p>The <code>&lt;camera&gt;</code> element defines where you're standing, what you're looking at, and how wide your lens is. SVG-Z uses a standard perspective projection — the same model used in OpenGL, WebGL, and virtually every 3D engine.</p>
+
+  <h2>eye, center, up</h2>
+  <p>These three vectors fully specify the camera's position and orientation in world space:</p>
+
+  <ul style="margin: 0 0 1.4em 1.4em; line-height: 2; font-size: 1rem;">
+    <li><strong>eye</strong> — where the camera is positioned</li>
+    <li><strong>center</strong> — the point it looks toward</li>
+    <li><strong>up</strong> — which direction is "up" (usually <code>0,1,0</code>)</li>
+  </ul>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">camera — eye and center</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <!-- Try changing eye to "5,5,15"
+       or center to "0,1,0" -->
+  <camera fov="50"
+    eye="0,0,15"
+    center="0,0,0"
+    up="0,1,0"/>
+
+  <sphere3d center="-1,0,0"
+    radius="0.9" subdivisions="24"
+    fill="#1a0a30" stroke="#7c6aff"
+    stroke-width="2"
+    lat-rings="5" lon-lines="5"/>
+
+  <sphere3d center="1,0,0"
+    radius="0.9" subdivisions="24"
+    fill="#001a10" stroke="#00ffc8"
+    stroke-width="2"
+    lat-rings="5" lon-lines="5"/>
+
+  <sphere3d center="0,1.4,0"
+    radius="0.6" subdivisions="20"
+    fill="#1a0020" stroke="#ff4d6d"
+    stroke-width="2"
+    lat-rings="3" lon-lines="3"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <h2>Field of view</h2>
+  <p>The <code>fov</code> attribute controls the vertical field of view in degrees. A low value (15–30°) creates a telephoto look — objects appear compressed and the perspective is flat. A high value (70–100°) creates a wide-angle look with strong perspective distortion.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">camera — fov comparison</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <!-- Try fov="20" vs fov="80" -->
+  <camera fov="50"
+    eye="0,2,15"
+    center="0,0,0"
+    up="0,1,0"/>
+
+  <!-- Grid of spheres at different depths -->
+  <sphere3d center="-2,0,2"
+    radius="0.5" subdivisions="20"
+    fill="#3d1e7a" stroke="#9977ff"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+  <sphere3d center="0,0,2"
+    radius="0.5" subdivisions="20"
+    fill="#006644" stroke="#00ffcc"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+  <sphere3d center="2,0,2"
+    radius="0.5" subdivisions="20"
+    fill="#7a1a30" stroke="#ff5566"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+  <sphere3d center="-2,0,-2"
+    radius="0.5" subdivisions="20"
+    fill="#664400" stroke="#ffbb33"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+  <sphere3d center="0,0,-2"
+    radius="0.5" subdivisions="20"
+    fill="#113388" stroke="#44aaff"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+  <sphere3d center="2,0,-2"
+    radius="0.5" subdivisions="20"
+    fill="#5a1a44" stroke="#ff88dd"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Try <code>fov="20"</code> — the spheres appear similar in size regardless of depth. Now try <code>fov="80"</code> — the near spheres loom much larger. This is perspective foreshortening in action.</p>
+
+  <h2>The orbit camera</h2>
+  <p>SVG-Z layers an interactive orbit system on top of the scene camera. The scene camera sets the <em>starting position</em>; the orbit controls modify it at runtime. The orbit is always centred on the <code>center</code> point.</p>
+
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>fov</td><td>60</td><td>Vertical field of view (degrees)</td></tr>
+    <tr><td>eye</td><td>0,0,5</td><td>Camera position in world space</td></tr>
+    <tr><td>center</td><td>0,0,0</td><td>Look-at target (orbit pivot)</td></tr>
+    <tr><td>up</td><td>0,1,0</td><td>World "up" vector</td></tr>
+    <tr><td>near</td><td>0.1</td><td>Near clip distance</td></tr>
+    <tr><td>far</td><td>100</td><td>Far clip distance</td></tr>
+    <tr><td>aa</td><td>—</td><td>Anti-aliasing mode: <code>off</code>, <code>msaa2</code>, <code>msaa4</code>, <code>tsaa</code>. Overrides any external mode setting</td></tr>
+    <tr><td>orbit</td><td>—</td><td>Auto-rotation speed. <code>1</code> = forward at default speed, <code>-1</code> = reverse, <code>2</code> = double speed, <code>0</code> = stopped</td></tr>
+  </table>
+
+  <h2>Auto-rotation with orbit</h2>
+  <p>Add <code>orbit="1"</code> to the camera to make the scene spin continuously. Positive values rotate forward, negative values reverse, and the number is a speed multiplier. Dragging always takes over immediately.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">camera — orbit auto-rotation</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <!-- orbit="1" spins the scene automatically -->
+  <camera fov="46" eye="4,3,12"
+    center="0,0,0" up="0,1,0"
+    orbit="1"/>
+
+  <!-- Central planet -->
+  <sphere3d center="0,0,0"
+    radius="1.1" subdivisions="28"
+    fill="#1a1050" stroke="#7c6aff"
+    stroke-width="2"
+    lat-rings="4" lon-lines="6"/>
+
+  <!-- Moon -->
+  <sphere3d center="2.3,0.3,0"
+    radius="0.38" subdivisions="18"
+    fill="#003325" stroke="#00ffc8"
+    stroke-width="2"
+    lat-rings="2" lon-lines="3"/>
+
+  <!-- Axis pole -->
+  <cylinder3d start="0,-1.5,0" end="0,1.5,0"
+    radius="0.04" subdivisions="8"
+    fill="#443366" stroke="none"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Try changing <code>orbit="1"</code> to <code>orbit="-1"</code> to reverse direction, or <code>orbit="3"</code> to spin faster. Set <code>orbit="0"</code> to stop.</p>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Set <code>eye="10,10,10"</code> and <code>center="0,0,0"</code>. You're now looking down from the upper-right corner.</p>
+    <p>Set <code>fov="15"</code> and move <code>eye</code> far back to <code>0,0,50</code>. Notice the orthographic-like appearance — objects at different depths look nearly the same size.</p>
+    <p>Try <code>up="0,0,1"</code>. The scene rotates 90° — "up" in the camera now points along the world Z axis.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-paths">← Paths &amp; Polygons</button>
+    <button class="ch-nav-btn next" data-ch="ch-depth">Depth &amp; Z-Buffer →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 04 -->
+<div class="chapter" id="ch-depth">
+  <div class="ch-eyebrow">Chapter 04</div>
+  <h1>Depth &amp; the Z-Buffer</h1>
+
+  <p>Most 2D graphics systems resolve what's in front using <em>painter's algorithm</em> — draw everything back to front, later draws overwrite earlier ones. It works for non-intersecting shapes, but breaks the moment two surfaces cross.</p>
+
+  <p>SVG-Z uses a <strong>z-buffer</strong>: a per-pixel depth value stored alongside the colour. Every time a pixel is about to be drawn, its depth is compared to whatever is already there. If it's closer, it wins. If not, it's discarded. The result is that intersection is free — the depth buffer resolves it automatically.</p>
+
+  <h2>depth-bias</h2>
+  <p>Coplanar surfaces — two polygons at exactly the same Z — cause <em>z-fighting</em>: the depth values are so close that rounding errors cause noisy flickering. The <code>depth-bias</code> attribute nudges a surface's depth by a small NDC offset to resolve this:</p>
+
+  <div class="live-editor" data-auto data-auto-rotate>
+    <div class="editor-header">
+      <span class="editor-label">depth-bias — resolving coplanar surfaces</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <camera fov="45" eye="0,0,5"
+    center="0,0,0" up="0,1,0"/>
+
+  <!-- Base plane -->
+  <polygon3d
+    points3d="-2,-2,0  2,-2,0  2,2,0  -2,2,0"
+    fill="#d0d8ee" stroke="#aab0cc"
+    stroke-width="2"/>
+
+  <!-- Grid overlay — depth-bias pulls it
+       just in front of the base plane -->
+  <path3d stroke="#2563eb" stroke-width="2"
+    fill="none" depth-bias="-0.001"
+    d3="M -2,0,0  L 2,0,0"/>
+  <path3d stroke="#2563eb" stroke-width="2"
+    fill="none" depth-bias="-0.001"
+    d3="M 0,-2,0  L 0,2,0"/>
+
+  <!-- Centre dot -->
+  <sphere3d center="0,0,0" radius="0.12"
+    subdivisions="12" fill="#dc2f5a"
+    stroke="none" lat-rings="0"
+    lon-lines="0"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <h2>render-order</h2>
+  <p>For cases where depth alone isn't enough — typically when you want one element to always render on top of another regardless of depth — use <code>render-order</code>. Elements are sorted by this integer value first, then by depth. Higher numbers render later (on top).</p>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Remove the <code>depth-bias="-0.001"</code> from the grid lines. Do you see z-fighting appear?</p>
+    <p>Add a second sphere at <code>center="0.8,0,0.3"</code> and give it <code>render-order="1"</code>. Notice it always draws on top of the first sphere even when partially behind it.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-camera">← The Camera</button>
+    <button class="ch-nav-btn next" data-ch="ch-sphere">Spheres →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 05 -->
+<div class="chapter" id="ch-sphere">
+  <div class="ch-eyebrow">Chapter 05</div>
+  <h1>Spheres</h1>
+
+  <p>The <code>&lt;sphere3d&gt;</code> element is the first true surface primitive in SVG-Z — a shape that exists in 3D space with genuine curvature, rather than just geometry projected from 2D paths.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">sphere3d — basic usage</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="52" eye="0,1.5,22"
+    center="0,0,0" up="0,1,0"/>
+
+  <sphere3d center="-1.2,0,0"
+    radius="1.1" subdivisions="28"
+    fill="#3b1f6e" stroke="#7c6aff"
+    stroke-width="2"
+    lat-rings="5" lon-lines="5"/>
+
+  <sphere3d center="1.2,0,0"
+    radius="0.8" subdivisions="20"
+    fill="#004d3d" stroke="#00ffc8"
+    stroke-width="2"
+    lat-rings="0" lon-lines="0"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>The right sphere has <code>lat-rings="0" lon-lines="0"</code> — all grid strokes disabled, leaving just the filled surface. The left sphere has 5 of each, giving it the characteristic globe appearance.</p>
+
+  <h2>Attributes</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>center</td><td>0,0,0</td><td>World-space centre position</td></tr>
+    <tr><td>radius</td><td>1</td><td>Sphere radius</td></tr>
+    <tr><td>subdivisions</td><td>24</td><td>Ring and sector count. Higher = smoother (4–64)</td></tr>
+    <tr><td>lat-rings</td><td>auto</td><td>Latitude stroke circles. Omit for auto, 0 to disable, N for exactly N</td></tr>
+    <tr><td>lon-lines</td><td>auto</td><td>Longitude meridian strokes. Same convention</td></tr>
+  </table>
+
+  <h2>Intersecting spheres</h2>
+  <p>Because sphere vertices are placed at true 3D surface positions before projection, the z-buffer can correctly resolve intersections:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">sphere3d — z-buffer intersection</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="52" eye="0,1.5,25"
+    center="0,0,0" up="0,1,0"/>
+  <group3d transform3d="rotateY(60)">
+    <sphere3d center="0,0,-0.5"
+      radius="1.4" subdivisions="28"
+      fill="#3b1f6e" stroke="#7c6aff"
+      stroke-width="2"
+      lat-rings="4" lon-lines="4"/>
+
+    <sphere3d center="0,0,0.5"
+      radius="1.1" subdivisions="24"
+      fill="#5a0020" stroke="#ff4d6d"
+      stroke-width="2"
+      lat-rings="4" lon-lines="4"/>
+  </group3d>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Set <code>subdivisions="6"</code> on one sphere. How does the surface look? Now try <code>subdivisions="48"</code>.</p>
+    <p>Overlap the two spheres so they fully intersect. Orbit the camera to see the cross-section plane where the surfaces meet.</p>
+    <p>Add a third sphere with <code>opacity="0.4"</code> placed over the others.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-depth">← Depth &amp; Z-Buffer</button>
+    <button class="ch-nav-btn next" data-ch="ch-cylinder">Cylinders &amp; Cones →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 06 -->
+<div class="chapter" id="ch-cylinder">
+  <div class="ch-eyebrow">Chapter 06</div>
+  <h1>Cylinders &amp; Cones</h1>
+
+  <p><code>&lt;cylinder3d&gt;</code> draws a cylinder — or, with a second radius, a cone frustum — between any two points in 3D space. Unlike most 3D engines which assume cylinders are axis-aligned, SVG-Z cylinders can point in any direction.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">cylinder3d — basic cylinder</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="50" eye="3,3,25"
+    center="0,0,0" up="0,1,0"/>
+
+  <cylinder3d
+    start="0,-1.5,0" end="0,1.5,0"
+    radius="0.7" subdivisions="36"
+    fill="#1a3a2a" stroke="#00ffc8"
+    stroke-width="2"
+    lines="8" rings="2"/>
+
+  <polygon3d
+    points3d="-3,-1.55,-3  3,-1.55,-3
+              3,-1.55,3  -3,-1.55,3"
+    fill="#e8e8f0" stroke="#c0c0d0"
+    stroke-width="2"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <h2>Cones and frustums</h2>
+  <p>Add a <code>radius2</code> attribute and the cylinder becomes a tapered frustum. Set <code>radius2="0"</code> and you get a true cone:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">cylinder3d — cone and open tube</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="50" eye="4,3,30"
+    center="0,0,0" up="0,1,0"/>
+
+  <!-- Cone: radius2=0 -->
+  <cylinder3d
+    start="-1.5,-1.5,0" end="-1.5,1.5,0"
+    radius="0.9" radius2="0"
+    subdivisions="32"
+    fill="#1a0040" stroke="#7c6aff"
+    stroke-width="2" lines="6"/>
+
+  <!-- Open tube: cap-start/end false -->
+  <cylinder3d
+    start="1.5,-1.5,0" end="1.5,1.5,0"
+    radius="0.7" subdivisions="32"
+    cap-start="false" cap-end="false"
+    fill="#2a0010" stroke="#ff4d6d"
+    stroke-width="2" lines="6"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <h2>Attributes</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>start</td><td>0,-1,0</td><td>Start endpoint in world space</td></tr>
+    <tr><td>end</td><td>0,1,0</td><td>End endpoint in world space</td></tr>
+    <tr><td>radius</td><td>1</td><td>Radius at the start end</td></tr>
+    <tr><td>radius2</td><td>same</td><td>Radius at the end. Omit = cylinder, 0 = cone</td></tr>
+    <tr><td>subdivisions</td><td>32</td><td>Sectors around the circumference</td></tr>
+    <tr><td>cap-start</td><td>true</td><td>Fill the start face</td></tr>
+    <tr><td>cap-end</td><td>true</td><td>Fill the end face</td></tr>
+    <tr><td>rings</td><td>0</td><td>Cross-section stroke rings along the barrel</td></tr>
+    <tr><td>lines</td><td>auto</td><td>Longitudinal stroke lines</td></tr>
+  </table>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Change the cone's <code>end</code> to <code>"0,2,-1"</code>. The cone now points in a diagonal direction.</p>
+    <p>Create a diagonal rod by setting <code>start="-2,-1,-1"</code> and <code>end="2,1,1"</code> with a small radius.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-sphere">← Spheres</button>
+    <button class="ch-nav-btn next" data-ch="ch-lathe">Lathe →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 07 -->
+<div class="chapter" id="ch-lathe">
+  <div class="ch-eyebrow">Chapter 07</div>
+  <h1>Lathe</h1>
+
+  <p>A lathe in woodworking spins a piece of wood against a cutting tool, producing a surface of revolution. <code>&lt;lathe3d&gt;</code> does the same digitally — you draw a 2D profile curve in the <code>d2</code> attribute and the renderer revolves it around an axis.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">lathe3d — a vase profile</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="48" eye="3,1,22"
+    center="0,0,0" up="0,1,0"/>
+
+  <lathe3d origin="0,0,0" axis="y"
+    sweep="360" subdivisions="48"
+    profile-samples="80"
+    fill="#1a0a30" stroke="#7c6aff"
+    stroke-width="2"
+    rings="6" lines="5"
+    d2="M 0,-1.5
+        C 0.8,-1.5  1.1,-1.2  0.9,-0.6
+        C 0.7,0.0   0.3,0.2   0.5,0.7
+        C 0.7,1.1   0.9,1.3   0.6,1.5
+        L 0,1.5"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>In the <code>d2</code> profile, <em>x</em> is the radial distance from the axis and <em>y</em> is the position along the axis. The profile starts at the base (<code>M 0,-1.5</code> — on the axis, at the bottom) and works up to the rim.</p>
+
+  <h2>Partial sweeps</h2>
+  <p>Set <code>sweep</code> to less than 360 to cut the revolution short, revealing the interior. Add <code>cap-start</code> and <code>cap-end</code> to close the cut faces:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">lathe3d — 270° partial sweep</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="50" eye="6,0,14"
+    center="0,1,0" up="0,1,0"/>
+
+  <lathe3d origin="0,0,0" axis="y"
+    sweep="270"
+    subdivisions="36"
+    profile-samples="64"
+    cap-start="true" cap-end="true"
+    fill="#001828" stroke="#00aaff"
+    stroke-width="2"
+    rings="4" lines="4"
+    d2="M 0,0
+        C 0.6,0  1.1,0.3  1.2,0.8
+        C 1.3,1.2  1.0,1.5  0.8,1.5
+        L 0,1.5"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Change the vase profile so the waist is much narrower — give it a tall wine-glass shape with a thin stem.</p>
+    <p>Try <code>axis="x"</code> instead of <code>axis="y"</code>. The shape revolves around the X axis.</p>
+    <p>Reduce <code>sweep</code> to <code>"90"</code> to see a quarter-slice of the object.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-cylinder">← Cylinders &amp; Cones</button>
+    <button class="ch-nav-btn next" data-ch="ch-extrude">Extrusions →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 08 -->
+<div class="chapter" id="ch-extrude">
+  <div class="ch-eyebrow">Chapter 08</div>
+  <h1>Extrusions</h1>
+
+  <p>Where lathe revolves a profile around an axis, <code>&lt;extrude3d&gt;</code> pushes it along one. Any 2D shape — square, star, letter, irregular polygon — can be extruded into a 3D solid.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">extrude3d — rounded rectangle</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <camera fov="50" eye="3,3,15"
+    center="0,0,0" up="0,1,0"/>
+  <group3d transform3d="rotateY(30)">
+    <extrude3d origin="0,-0.5,0"
+      dir="0,1,0" depth="1"
+      axis-x="1,0,0" axis-y="0,0,1"
+      cap-start="true" cap-end="true"
+      fill="#001a30" stroke="#00aaff"
+      stroke-width="2"
+      rings="1" lines="4"
+      d2="M -0.8,0.3
+          C -0.8,0.6  -0.6,0.8  -0.3,0.8
+          L 0.3,0.8
+          C 0.6,0.8  0.8,0.6  0.8,0.3
+          L 0.8,-0.3
+          C 0.8,-0.6  0.6,-0.8  0.3,-0.8
+          L -0.3,-0.8
+          C -0.6,-0.8  -0.8,-0.6  -0.8,-0.3 Z"/>
+  </group3d>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <h2>Concave profiles</h2>
+  <p>The cap triangulation uses ear-clipping, which handles concave shapes correctly — stars, letters, irregular polygons all produce correct filled end-caps:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">extrude3d — concave star</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#06060a">
+  <camera fov="50" eye="3,3,11"
+    center="0,0.4,0" up="0,1,0"/>
+
+  <extrude3d origin="0,-0.3,0"
+    dir="0,1,0" depth="0.6"
+    axis-x="1,0,0" axis-y="0,0,1"
+    cap-start="true" cap-end="true"
+    fill="#1a0030" stroke="#cc44ff"
+    stroke-width="2"
+    rings="1" lines="5"
+    d2="M 0,-1
+        L 0.22,-0.31  L 0.95,-0.31  L 0.36,0.12
+        L 0.59,0.81  L 0,0.38  L -0.59,0.81
+        L -0.36,0.12  L -0.95,-0.31  L -0.22,-0.31 Z"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Change the star's <code>depth</code> from <code>0.6</code> to <code>2</code> for a thick extruded star.</p>
+    <p>Try <code>dir="1,0,0"</code> instead of <code>"0,1,0"</code> to extrude sideways instead of upward.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-lathe">← Lathe</button>
+    <button class="ch-nav-btn next" data-ch="ch-surface">Bézier Patches →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 09 -->
+<div class="chapter" id="ch-surface">
+  <div class="ch-eyebrow">Chapter 09</div>
+  <h1>Bézier Patches</h1>
+
+  <p>All the surface primitives so far — spheres, cylinders, lathe, extrude — are <em>procedural</em>. You set parameters and the geometry is generated. But sometimes you need a surface that doesn't fit any procedure. A saddle shape. A twist. A wave.</p>
+
+  <p>For these, SVG-Z has <strong>bicubic Bézier patches</strong>.</p>
+
+  <h2>The B command</h2>
+  <p>The <code>&lt;surface3d&gt;</code> element takes a <code>d3</code> attribute containing one or more <code>B</code> commands. Each <code>B</code> is followed by 16 control points in a 4×4 grid. The four corner points lie exactly on the surface; the interior points act as tangent handles.</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">surface3d — saddle surface</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="52" eye="3,3,20"
+    center="0,0,0" up="0,1,0"/>
+
+  <surface3d subdivisions="20"
+    rings="6" lines="6"
+    fill="#001a28" stroke="#00aaff"
+    stroke-width="2"
+    d3="B
+      -1.5,0,-1.5   -0.5,-0.7,-1.5   0.5,-0.7,-1.5   1.5,0,-1.5
+      -1.5,0.7,-0.5  -0.5,0,-0.5     0.5,0,-0.5      1.5,0.7,-0.5
+      -1.5,0.7,0.5   -0.5,0,0.5      0.5,0,0.5       1.5,0.7,0.5
+      -1.5,0,1.5    -0.5,-0.7,1.5   0.5,-0.7,1.5    1.5,0,1.5"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>The saddle dips down at the front and back edges and rises at the left and right — the classic hyperbolic paraboloid shape. Orbit to see it from different angles.</p>
+
+  <h2>Multiple patches — twisted ribbon</h2>
+  <p>A single <code>d3</code> attribute can contain multiple <code>B</code> commands. Here a single patch twists from a vertical cross-section at the left end to a horizontal one at the right:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">surface3d — twisted ribbon patch</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="50" eye="3,2,20"
+    center="0,0,0" up="0,1,0"/>
+
+  <surface3d subdivisions="24"
+    rings="8" lines="4"
+    fill="#1a1000" stroke="#ffaa00"
+    stroke-width="2"
+    d3="B
+      -1.5,-0.8,0   -1.5,-0.27,0   -1.5,0.27,0   -1.5,0.8,0
+      -0.5,-0.69,-0.4  -0.5,-0.23,-0.14  -0.5,0.23,0.14  -0.5,0.69,0.4
+       0.5,-0.4,-0.69   0.5,-0.14,-0.23   0.5,0.14,0.23   0.5,0.4,0.69
+       1.5,0,-0.8    1.5,0,-0.27    1.5,0,0.27    1.5,0,0.8"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>In the saddle example, change the Y values of the corner control points to make the saddle more dramatic.</p>
+    <p>Try making the saddle surface transparent with <code>opacity="0.5"</code> and placing a sphere underneath it.</p>
+    <p>Modify the twisted ribbon's middle control points to increase the twist depth.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-extrude">← Extrusions</button>
+    <button class="ch-nav-btn next" data-ch="ch-transparency">Transparency →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 10 -->
+<div class="chapter" id="ch-transparency">
+  <div class="ch-eyebrow">Chapter 10</div>
+  <h1>Transparency</h1>
+
+  <p>Transparency in 3D is a hard problem. The naive approach — draw everything back-to-front — fails the moment two transparent surfaces intersect. There is no single correct sort order when surfaces cross.</p>
+
+  <p>SVG-Z uses <strong>Weighted Blended Order-Independent Transparency</strong> (WBOIT), a technique that accumulates transparent fragments without sorting and resolves them in a single compositing pass.</p>
+
+  <h2>How it works</h2>
+  <p>Every frame runs three passes. First, all <em>opaque</em> geometry is rasterised normally into the z-buffer. Then, transparent geometry is accumulated into two per-pixel buffers — a weighted colour sum and a running product of <code>(1 − alpha)</code> values called the <em>revealage</em>. Finally, a resolve pass composites the weighted result over the opaque framebuffer:</p>
+
+  <div class="math-display">
+    weight(z, α) = α · clamp(0.03 / (ε + z⁴), 0.01, 3000)<br>
+    output = weightedColour × (1 − revealage) + opaqueColour × revealage
+  </div>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">transparency — WBOIT intersection test</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060608">
+  <camera fov="48" eye="3,3,25"
+    center="0,0,0" up="0,1,0"/>
+  <group3d transform3d="rotateY(45)">
+    <polygon3d
+      points3d="-2,-2,0  2,-2,0  2,2,0  -2,2,0"
+      fill="#00ffc8" opacity="0.55"/>
+
+    <polygon3d
+      points3d="0,-2,-2  0,2,-2  0,2,2  0,-2,2"
+      fill="#ff4d6d" opacity="0.55"/>
+
+    <polygon3d
+      points3d="-2,0,-2  2,0,-2  2,0,2  -2,0,2"
+      fill="#7c6aff" opacity="0.55"/>
+
+    <!-- Opaque sphere at the centre -->
+    <sphere3d center="0,0,0" radius="0.3"
+      subdivisions="16" fill="#ffffff"
+      stroke="none" lat-rings="0"
+      lon-lines="0"/>
+  </group3d>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>Orbit the camera to any angle. The three plane intersections always blend correctly — the central white sphere always appears through all three, and the blend colours at each intersection are stable regardless of view direction.</p>
+
+  <div class="note">
+    <div class="note-label">// note</div>
+    Any element with <code>opacity &lt; 1</code>, or a fill/stroke colour with alpha &lt; 255, is automatically routed through the WBOIT pass. Fully opaque elements always use the standard z-buffer path.
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-label">// exercises</div>
+    <p>Change all three plane opacities to <code>0.9</code>. The overlapping regions become much darker.</p>
+    <p>Add a transparent sphere with <code>opacity="0.3"</code> placed over one of the planes.</p>
+  </div>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-surface">← Bézier Patches</button>
+    <button class="ch-nav-btn next" data-ch="ch-aa">Anti-Aliasing →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 11 -->
+<div class="chapter" id="ch-aa">
+  <div class="ch-eyebrow">Chapter 11</div>
+  <h1>Anti-Aliasing</h1>
+
+  <p>Rasterisation produces aliased edges — the staircase effect where diagonal lines appear jagged. SVG-Z offers two anti-aliasing approaches with very different cost/quality profiles.</p>
+
+  <h2>TSAA — Temporal Super-Sampling</h2>
+  <p>Each frame, the projection matrix is offset by a tiny sub-pixel amount using a <em>Halton sequence</em> — a low-discrepancy pattern that distributes 8 sample positions very evenly across the pixel footprint. The result is blended into a history buffer:</p>
+
+  <div class="math-display">
+    history = current × blendAlpha + history × (1 − blendAlpha)
+  </div>
+
+  <p>When the camera is still, <code>blendAlpha = 0.2</code> — the history accumulates slowly over 8 frames. When the camera moves, <code>blendAlpha = 0.6</code> — the history turns over quickly to prevent ghosting.</p>
+
+  <h2>MSAA — Multisample Anti-Aliasing</h2>
+  <p>MSAA renders into a 2× or 4× supersampled internal buffer and box-filters down to the display resolution. The result is consistent in motion (no history to become stale), but costs 4× or 16× fill rate. The demos in this book use <strong>MSAA×4</strong> as the default.</p>
+
+  <p>See the difference between modes:</p>
+
+  <div class="live-editor" data-aa="off">
+    <div class="editor-header">
+      <span class="editor-label">Anti-aliasing OFF — jagged edges visible</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060610">
+  <camera fov="45" eye="3,3,18"
+    center="0,0,0" up="0,1,0"/>
+
+  <cylinder3d
+    start="0,-1.5,0" end="0,1.5,0"
+    radius="0.8" subdivisions="32"
+    fill="#1a1a40" stroke="#8888ff"
+    stroke-width="2" lines="8" rings="2"/>
+
+  <polygon3d
+    points3d="-3,-1.55,-3  3,-1.55,-3
+              3,-1.55,3  -3,-1.55,3"
+    fill="#e8e8f0" stroke="#c0c0d0"
+    stroke-width="2"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <div class="live-editor" data-aa="msaa4">
+    <div class="editor-header">
+      <span class="editor-label">MSAA×4 — smooth edges</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060610">
+  <camera fov="45" eye="3,3,18"
+    center="0,0,0" up="0,1,0"/>
+
+  <cylinder3d
+    start="0,-1.5,0" end="0,1.5,0"
+    radius="0.8" subdivisions="32"
+    fill="#1a1a40" stroke="#8888ff"
+    stroke-width="2" lines="8" rings="2"/>
+
+  <polygon3d
+    points3d="-3,-1.55,-3  3,-1.55,-3
+              3,-1.55,3  -3,-1.55,3"
+    fill="#e8e8f0" stroke="#c0c0d0"
+    stroke-width="2"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <div class="live-editor" data-aa="tsaa">
+    <div class="editor-header">
+      <span class="editor-label">TSAA — temporal smoothing (wait a moment when still)</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060610">
+  <camera fov="45" eye="3,3,18"
+    center="0,0,0" up="0,1,0"/>
+
+  <cylinder3d
+    start="0,-1.5,0" end="0,1.5,0"
+    radius="0.8" subdivisions="32"
+    fill="#1a1a40" stroke="#8888ff"
+    stroke-width="2" lines="8" rings="2"/>
+
+  <polygon3d
+    points3d="-3,-1.55,-3  3,-1.55,-3
+              3,-1.55,3  -3,-1.55,3"
+    fill="#e8e8f0" stroke="#c0c0d0"
+    stroke-width="2"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <p>TSAA and MSAA×4 produce similar quality at rest. The key difference: TSAA costs nothing extra per frame but lags slightly after motion; MSAA×4 is sharp immediately but costs 16× more rasterisation.</p>
+
+  <h2>Setting AA in the scene</h2>
+  <p>You can set the anti-aliasing mode directly inside the <code>&lt;camera&gt;</code> element rather than relying on the embedding page:</p>
+
+  <div class="live-editor">
+    <div class="editor-header">
+      <span class="editor-label">aa — declared in camera element</span>
+    </div>
+    <div class="editor-body full-canvas">
+      <div style="padding:20px;background:var(--code-bg);font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--code-text)">
+&lt;camera fov="50" eye="3,3,18" center="0,0,0" up="0,1,0"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffcc66">aa="msaa4"</span>/&gt;
+      </div>
+    </div>
+  </div>
+
+  <p>This is the recommended approach for standalone <code>&lt;svgz&gt;</code> embeds — the scene carries its own quality setting rather than depending on how it's hosted.</p>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-transparency">← Transparency</button>
+    <button class="ch-nav-btn next" data-ch="ch-ref">Full Reference →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH 00B -->
+<div class="chapter" id="ch-controls">
+  <div class="ch-eyebrow">Chapter 01</div>
+  <h1>Controls &amp; Interaction</h1>
+
+  <p>Every SVG-Z canvas is interactive. You can orbit the camera, zoom in and out, and pan the view — all without writing any JavaScript. The controls are built in and work on any rendered canvas.</p>
+
+  <h2>Orbit (rotate)</h2>
+  <p><strong>Left-drag</strong> on the canvas to orbit the camera around the scene's <code>center</code> point. The horizontal drag changes the azimuth angle; vertical drag changes the elevation. The camera always keeps the <code>up</code> vector as its reference.</p>
+
+  <h2>Zoom</h2>
+  <p><strong>Scroll wheel</strong> to zoom in and out. This adjusts the orbit radius — the camera moves closer to or further from the <code>center</code> point along the current view direction. The minimum zoom keeps the camera at half the original distance.</p>
+
+  <h2>Pan</h2>
+  <p><strong>Shift + left-drag</strong>, or <strong>right-drag</strong>, to pan the view. Panning moves both the camera <code>eye</code> and the <code>center</code> together, shifting the entire scene without changing the viewing direction.</p>
+
+  <h2>The controls button</h2>
+  <p>Each canvas has a small <strong>?</strong> button in the bottom-right corner. Click it to show a quick-reference overlay. Try it now:</p>
+
+  <div class="live-editor" data-auto>
+    <div class="editor-header">
+      <span class="editor-label">controls — try the ? button on the canvas</span>
+      <button class="editor-run">▶ RUN</button>
+    </div>
+    <div class="editor-body">
+      <div class="editor-code">
+        <textarea class="code"><svgz width="320" height="320"
+  background="#060610">
+  <camera fov="50" eye="3,3,15"
+    center="0,0,0" up="0,1,0"/>
+
+  <sphere3d center="-1,0,0"
+    radius="0.8" subdivisions="24"
+    fill="#1a0a30" stroke="#7c6aff"
+    stroke-width="2"
+    lat-rings="4" lon-lines="4"/>
+
+  <sphere3d center="1,0,0"
+    radius="0.8" subdivisions="24"
+    fill="#001a10" stroke="#00ffc8"
+    stroke-width="2"
+    lat-rings="4" lon-lines="4"/>
+
+  <cylinder3d
+    start="-1,0,0" end="1,0,0"
+    radius="0.15" subdivisions="16"
+    fill="#333350" stroke="none"/>
+</svgz></textarea>
+      </div>
+      <div class="editor-canvas-wrap">
+        <canvas width="320" height="320"></canvas>
+      </div>
+    </div>
+    <div class="editor-error"></div>
+  </div>
+
+  <h2>Keyboard shortcut</h2>
+  <p>Press <strong>Ctrl+Enter</strong> (or <strong>Cmd+Enter</strong> on Mac) while the code editor is focused to re-run the scene without clicking the RUN button.</p>
+
+  <h2>Auto-rotation</h2>
+  <p>Add <code>orbit="1"</code> to a <code>&lt;camera&gt;</code> to make a scene auto-rotate. Positive values spin forward; negative values reverse. The speed is a multiplier — <code>orbit="2"</code> is twice as fast. Dragging to orbit manually always takes over immediately.</p>
+
+  <div class="live-editor">
+    <div class="editor-header">
+      <span class="editor-label">orbit — built into the camera element</span>
+    </div>
+    <div class="editor-body full-canvas">
+      <div style="padding:20px;background:var(--code-bg);font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--code-text)">
+&lt;camera fov="50" eye="3,3,15" center="0,0,0" up="0,1,0"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffcc66">orbit="1"</span>/&gt;
+      </div>
+    </div>
+  </div>
+
+  <table class="attr-table">
+    <tr><th>Input</th><th>Action</th></tr>
+    <tr><td>left-drag</td><td>Orbit (rotate around center)</td></tr>
+    <tr><td>scroll wheel</td><td>Zoom in / out</td></tr>
+    <tr><td>shift + drag</td><td>Pan (move eye and center together)</td></tr>
+    <tr><td>right-drag</td><td>Pan (alternative)</td></tr>
+    <tr><td>? button</td><td>Show controls overlay</td></tr>
+    <tr><td>Ctrl/Cmd+Enter</td><td>Re-run code in editor</td></tr>
+  </table>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-intro">← What is SVG-Z?</button>
+    <button class="ch-nav-btn next" data-ch="ch-hello">Hello, 3D World →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CH REF -->
+<div class="chapter" id="ch-ref">
+  <div class="ch-eyebrow">Reference</div>
+  <h1>Full Reference</h1>
+
+  <h2>camera</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>fov</td><td>60</td><td>Vertical field of view (degrees)</td></tr>
+    <tr><td>eye</td><td>0,0,5</td><td>Camera position in world space</td></tr>
+    <tr><td>center</td><td>0,0,0</td><td>Look-at target and orbit pivot</td></tr>
+    <tr><td>up</td><td>0,1,0</td><td>World "up" vector</td></tr>
+    <tr><td>near</td><td>0.1</td><td>Near clip distance</td></tr>
+    <tr><td>far</td><td>100</td><td>Far clip distance</td></tr>
+    <tr><td>aa</td><td>—</td><td>Anti-aliasing mode: <code>off</code> · <code>msaa2</code> · <code>msaa4</code> · <code>tsaa</code>. Overrides external mode</td></tr>
+    <tr><td>orbit</td><td>—</td><td>Auto-rotation speed multiplier. <code>1</code>=forward, <code>-1</code>=reverse, <code>0</code>=stopped</td></tr>
+  </table>
+
+  <h2>path3d</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Values</th><th>Description</th></tr>
+    <tr><td>d3</td><td>path string</td><td>M x,y,z · L x,y,z · C (×3) · Q (×2) · Z</td></tr>
+    <tr><td>fill</td><td>colour / none</td><td>Fill colour for closed paths</td></tr>
+    <tr><td>stroke</td><td>colour / none</td><td>Stroke colour</td></tr>
+    <tr><td>stroke-width</td><td>number</td><td>Stroke width in screen pixels (min 2 recommended)</td></tr>
+    <tr><td>opacity</td><td>0–1</td><td>Overall opacity. &lt;1 routes through WBOIT</td></tr>
+    <tr><td>depth-bias</td><td>number</td><td>NDC depth offset. Use small values like -0.001</td></tr>
+    <tr><td>render-order</td><td>integer</td><td>Sort key; higher = renders on top</td></tr>
+  </table>
+
+  <h2>sphere3d</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>center</td><td>0,0,0</td><td>World-space position</td></tr>
+    <tr><td>radius</td><td>1</td><td>Radius</td></tr>
+    <tr><td>subdivisions</td><td>24</td><td>Ring and sector density (4–64)</td></tr>
+    <tr><td>lat-rings</td><td>auto</td><td>Latitude lines: null=auto, 0=off, N=exactly N</td></tr>
+    <tr><td>lon-lines</td><td>auto</td><td>Longitude lines: same convention</td></tr>
+  </table>
+
+  <h2>cylinder3d</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>start / end</td><td>0,-1,0 / 0,1,0</td><td>Endpoints in world space</td></tr>
+    <tr><td>radius</td><td>1</td><td>Radius at start</td></tr>
+    <tr><td>radius2</td><td>=radius</td><td>Radius at end. 0 = cone</td></tr>
+    <tr><td>subdivisions</td><td>32</td><td>Circumference sectors</td></tr>
+    <tr><td>cap-start / cap-end</td><td>true</td><td>Fill end faces</td></tr>
+    <tr><td>rings / lines</td><td>0 / auto</td><td>Cross-section / longitudinal strokes</td></tr>
+  </table>
+
+  <h2>lathe3d</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>d2</td><td>—</td><td>2D profile (M/L/C/Q/Z). x=radius, y=height</td></tr>
+    <tr><td>origin</td><td>0,0,0</td><td>Pivot point</td></tr>
+    <tr><td>axis</td><td>y</td><td>Axis of revolution: x, y, or z</td></tr>
+    <tr><td>sweep</td><td>360</td><td>Degrees of revolution (1–360)</td></tr>
+    <tr><td>subdivisions</td><td>48</td><td>Sectors around revolution</td></tr>
+    <tr><td>profile-samples</td><td>64</td><td>Profile curve sampling density</td></tr>
+    <tr><td>cap-start / cap-end</td><td>true</td><td>Close partial sweep faces</td></tr>
+    <tr><td>rings / lines</td><td>auto</td><td>Cross-section / profile strokes</td></tr>
+  </table>
+
+  <h2>extrude3d</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>d2</td><td>—</td><td>2D profile (M/L/C/Q/Z)</td></tr>
+    <tr><td>origin</td><td>0,0,0</td><td>Start face anchor</td></tr>
+    <tr><td>dir</td><td>0,0,1</td><td>Extrusion direction (normalised)</td></tr>
+    <tr><td>depth</td><td>1</td><td>Extrusion length</td></tr>
+    <tr><td>axis-x / axis-y</td><td>1,0,0 / 0,1,0</td><td>Profile plane orientation</td></tr>
+    <tr><td>steps</td><td>1</td><td>Cross-section slices</td></tr>
+    <tr><td>cap-start / cap-end</td><td>true</td><td>Fill end faces (ear-clipped)</td></tr>
+    <tr><td>rings / lines</td><td>auto</td><td>Ring / longitudinal strokes</td></tr>
+  </table>
+
+  <h2>surface3d</h2>
+  <table class="attr-table">
+    <tr><th>Attribute</th><th>Default</th><th>Description</th></tr>
+    <tr><td>d3</td><td>—</td><td>B commands with 16 x,y,z control points each</td></tr>
+    <tr><td>subdivisions</td><td>16</td><td>Tessellation density per patch (2–64)</td></tr>
+    <tr><td>rings / lines</td><td>auto</td><td>Iso-V / iso-U parameter stroke lines</td></tr>
+  </table>
+
+  <div class="ch-nav">
+    <button class="ch-nav-btn" data-ch="ch-aa">← Anti-Aliasing</button>
+    <span></span>
+  </div>
+</div>
+
+</main>
+</div><!-- .book -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  BOOK ENGINE
+// ═══════════════════════════════════════════════════════════════
+
+// ── Navigation ───────────────────────────────────────────────────
+function showChapter(id) {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.remove('visible'));
+  const ch = document.getElementById(id);
+  if (ch) {
+    ch.classList.add('visible');
+    ch.querySelectorAll('.live-editor[data-auto], .live-editor[data-aa]').forEach(initEditor);
+    window.scrollTo({ top: 0 });
+  }
+  document.querySelectorAll('nav a').forEach(a => {
+    a.classList.toggle('active', a.dataset.ch === id);
+  });
+}
+
+document.querySelectorAll('nav a, .ch-nav-btn, button[data-ch]').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    const ch = el.dataset.ch;
+    if (ch) showChapter(ch);
+  });
+});
+
+// ── Live editors ─────────────────────────────────────────────────
+const editorRenderers = new WeakMap();
+
+function initEditor(editorEl) {
+  if (editorRenderers.has(editorEl)) return;
+  const textarea = editorEl.querySelector('textarea.code');
+  const canvas   = editorEl.querySelector('canvas');
+  const errorEl  = editorEl.querySelector('.editor-error');
+  const runBtn   = editorEl.querySelector('.editor-run');
+  if (!textarea || !canvas) return;
+
+  // Determine AA mode: data-aa attribute overrides default msaa4
+  const aaAttr   = editorEl.dataset.aa;        // 'off' | 'tsaa' | 'msaa2' | 'msaa4' | undefined
+  const aaMode   = aaAttr !== undefined ? aaAttr : 'msaa4';  // default MSAAx4
+  const autoRot  = editorEl.hasAttribute('data-auto-rotate');
+
+  const renderer = new SVGZRenderer(canvas);
+  if (aaMode !== 'off') renderer.raster.setMode(aaMode);
+  editorRenderers.set(editorEl, renderer);
+
+  // Add controls help button
+  const wrap = editorEl.querySelector('.editor-canvas-wrap');
+  if (wrap) {
+    const btn = document.createElement('button');
+    btn.className = 'controls-btn';
+    btn.title = 'Show controls';
+    btn.textContent = '?';
+    const tip = document.createElement('div');
+    tip.className = 'controls-tooltip';
+    tip.innerHTML = '🖱 Drag — orbit<br>⚙ Scroll — zoom<br>⇧ Shift+drag — pan';
+    wrap.appendChild(btn);
+    wrap.appendChild(tip);
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      tip.classList.toggle('visible');
+    });
+    document.addEventListener('click', () => tip.classList.remove('visible'));
+  }
+
+  const loop = time => {
+    requestAnimationFrame(loop);
+    // orbit speed: data-auto-rotate on editor = speed 1; camera aa="orbit" speed overrides
+    const camOrbit = renderer.scene && renderer.scene.camera.orbit;
+    const orbitSpeed = camOrbit !== null ? camOrbit : (autoRot ? 1 : 0);
+    const spinning = orbitSpeed !== 0;
+    const inMotion = spinning || renderer._drag !== null || renderer._scrolling;
+    if (inMotion) {
+      if (spinning) renderer.orbit.theta += 0.008 * orbitSpeed;
+      renderer.dirty = true;
+      renderer.dirtyFrames = renderer.TSAA_TAPS;
+    }
+    if (renderer.dirtyFrames <= 0) return;
+    renderer.dirtyFrames--;
+    if (renderer.dirtyFrames === 0) renderer.dirty = false;
+    renderer.render(inMotion);
+  };
+
+  function run() {
+    const src = textarea.value.trim();
+    try {
+      renderer.load(src);
+      if (errorEl) errorEl.textContent = '';
+    } catch(e) {
+      if (errorEl) errorEl.textContent = '✗  ' + e.message;
+    }
+  }
+
+  if (runBtn) runBtn.addEventListener('click', run);
+
+  textarea.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault(); run();
+    }
+  });
+
+  run();
+  loop(performance.now());
+}
+
+// Init editors in the first visible chapter
+document.querySelectorAll('.chapter.visible .live-editor[data-auto], .chapter.visible .live-editor[data-aa]').forEach(initEditor);
+
+// ── Hash routing ─────────────────────────────────────────────────
+function routeFromHash() {
+  const hash = location.hash.slice(1);
+  const valid = document.getElementById(hash);
+  if (valid && valid.classList.contains('chapter')) showChapter(hash);
+}
+window.addEventListener('hashchange', routeFromHash);
+routeFromHash();
+
+// ── Mobile nav drawer ─────────────────────────────────────────────
+const navEl       = document.getElementById('navEl');
+const navToggle   = document.getElementById('navToggle');
+const navClose    = document.getElementById('navClose');
+const navBackdrop = document.getElementById('navBackdrop');
+
+function openNav()  { navEl.classList.add('open'); navBackdrop.classList.add('open'); }
+function closeNav() { navEl.classList.remove('open'); navBackdrop.classList.remove('open'); }
+
+navToggle.addEventListener('click', openNav);
+navClose.addEventListener('click', closeNav);
+navBackdrop.addEventListener('click', closeNav);
+
+// Close the drawer automatically when a chapter link is tapped on mobile
+document.querySelectorAll('nav a[data-ch]').forEach(a => {
+  a.addEventListener('click', () => { if (window.innerWidth <= 900) closeNav(); });
+});
+</script>
+</body>
+</html>
